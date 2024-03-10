@@ -59,6 +59,7 @@ For example for both of the views (start, success) in this challenge the main wr
 I also took sometime to read up on form validation as I am used with it being only js validation. 
 The browsers nowadays has aldready good validation on the client side with new attributes to the input element. I did do some custom JavaScript in this challenge, mainly for the error message placement in the design. But I still used the Constraint Validation API that exists in the browser. 
 I did some research on other used the API in their solutions. 
+The JavaScript needs a specific structure otherwise it won't work so it can be more flexible if I compare to Pristine validation library. 
 
 For this challenge I don't agree with the placement of the error message. I think it will be too tight between the label and the error message. I feel it would be better to have the error message below the input. 
 
@@ -66,6 +67,10 @@ For this challenge I don't agree with the placement of the error message. I thin
 
 - aria/accessibility
 - grid
+
+**ToDos**
+- Add validation when the user is changing the input.
+- Fix the `validateField` function regarding parent element. This should not return true when parent element doesn't exists. 
 
 ### Useful resources
 
