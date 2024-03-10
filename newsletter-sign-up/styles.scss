@@ -1,0 +1,89 @@
+@use 'scss/base';
+@use 'scss/list';
+@use 'scss/form';
+
+.box {
+  background-color: var(--white);
+  min-height: 100vh;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.content {
+  padding: var(--padding);
+}
+
+.state--success {
+  overflow: hidden;
+
+  .success-state-container {
+    visibility: visible;
+  }
+
+  main {
+    visibility: hidden;
+  }
+}
+
+.success-state-container {
+  inset: 0;
+  min-height: 100vh;
+  position: fixed;
+  visibility: hidden;
+  z-index: 5;
+
+  .box {
+    padding: var(--padding);
+  }
+
+  img {
+    height: 64px;
+    width: 64px;
+  }
+}
+
+[data-btn-close] {
+  bottom: var(--padding);
+  left: var(--padding);
+  position: fixed;
+  right: var(--padding);
+  width: auto;
+}
+
+/* Media queries */
+
+@media screen and (min-width: 50em) {
+  .box {
+    border-radius: 2rem;
+    min-height: auto;
+    padding: 1rem;
+  }
+
+  .grid {
+    align-items: center;
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .state--success {
+    .success-state-container {
+      .box {
+        left: 50%;
+        max-width: 25rem;
+        min-height: auto;
+        position: absolute;
+        top: 50%;
+        transform: translate3d(-50%, -50%, 0);
+      }
+    }
+  }
+
+  [data-btn-close] {
+    inset: auto;
+    position: relative;
+    width: 100%;
+  }
+}

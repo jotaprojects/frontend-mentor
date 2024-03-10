@@ -1,0 +1,70 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --tomato: hsl(4, 100%, 67%);
+  --slate: hsl(234, 29%, 20%);
+  --charcoal: hsl(235, 18%, 26%);
+  --grey: hsl(231, 7%, 60%);
+  --white: #fff;
+  --black: #000;
+  --padding: 2rem;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  align-items: center;
+  background-color: var(--slate);
+  color: var(--charcoal);
+  display: flex;
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  justify-content: center;
+  margin: 0;
+  min-height: 100vh;
+  padding: 0;
+}
+
+h1 {
+  font-size: 2.6rem;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+p {
+  line-height: 1.5rem;
+}
+
+img {
+  max-width: 100%;
+  width: 100%;
+}
+
+a {
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Media queries */
+
+@media screen and (min-width: 50em) {
+  h1 {
+    font-size: 3rem;
+    margin-bottom: .5rem;
+  }
+}
