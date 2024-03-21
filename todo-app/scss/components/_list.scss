@@ -1,0 +1,19 @@
+.list-container {
+  grid-area: top;
+}
+
+.list {
+  color: var(--f-clr-primary);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list__item {
+  align-items: center;
+  border-bottom: 1px solid var(--border-clr);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto 1fr auto;
+  padding: .2rem var(--padding);
+}

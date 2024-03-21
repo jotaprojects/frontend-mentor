@@ -1,0 +1,43 @@
+form {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+}
+
+label {
+  padding: .8rem 0;
+}
+
+input[type="text"] {
+  background-color: transparent;
+  border: 0;
+  color: var(--f-clr-primary);
+  flex-grow: 1;
+  font-size: .8rem;
+  padding: .4rem .3rem;
+
+  &:focus {
+    outline: 1px solid var(--border-clr);
+  }
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  border: 1px solid var(--border-clr);
+  border-radius: 50%;
+  flex-shrink: 0;
+  height: 1.3rem;
+  margin: 0;
+  width: 1.3rem;
+
+  &:checked {
+    background: 
+      url('images/icon-check.svg') no-repeat center center, 
+      var(--gradient);
+  }
+
+  &:checked + label {
+    color: var(--f-clr-secondary);
+    text-decoration: line-through;
+  }
+}

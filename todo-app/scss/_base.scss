@@ -1,0 +1,175 @@
+:root {
+  --bg-clr: hsl(235, 21%, 11%);
+
+  --clr-blue: hsl(220, 98%, 61%);
+  --clr-grey-100: hsl(0, 0%, 98%);
+  --clr-grey-200: hsl(236, 33%, 92%);
+  --clr-grey-400: hsl(233, 11%, 84%);
+  --clr-grey-600: hsl(236, 9%, 61%);
+  --clr-grey-800: hsl(235, 19%, 35%);
+  --clr-blue-100: hsl(234, 39%, 85%);
+  --clr-blue-200: hsl(233, 11%, 52%);
+  --clr-blue-400: hsl(233, 14%, 35%);
+  --clr-blue-600: hsl(237, 14%, 26%);
+  --clr-blue-800: hsl(235, 24%, 19%);
+  --clr-blue-900: hsl(235, 21%, 11%);
+
+  --gradient: linear-gradient(120deg, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
+
+  --f-family: "Josefin Sans", sans-serif;
+  --f-size: 16px;
+  --f-normal: 400;
+  --f-bold: 700;
+  --f-clr-primary: var(--clr-blue-100);
+  --f-clr-secondary: var(--clr-blue-200);
+
+  --border-radius: .4rem;
+  --border-clr: var(--clr-blue-600);
+
+  --padding: 1rem;
+
+  --filter-height: 4rem;
+
+  --box-clr-bg: var(--clr-blue-800);
+}
+
+[data-theme="light"] {
+  --bg-clr: hsl(0, 0%, 98%);
+
+  --f-clr-primary: var(--clr-grey-800);
+  --f-clr-secondary: var(--clr-grey-600);
+
+  --box-clr-bg: hsl(0, 0%, 100%);
+
+  --border-clr: var(--clr-grey-200);
+
+  .mode__icon--dark {
+    display: block;
+  }
+
+  .mode__icon--light {
+    display: none;
+  }
+}
+
+html {
+  font-size: var(--f-size);
+}
+
+body {
+  font-family: var(--f-family);
+  font-optical-sizing: auto;
+  font-weight: var(--f-normal);
+  margin: 0;
+  padding: calc(var(--padding) * 2);
+
+  background-color: var(--bg-clr);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mode__icon--dark {
+  display: none;
+}
+
+.mode__icon--light {
+  display: block;
+}
+
+button {
+  background-color: transparent;
+  border: 0;
+  padding: .5rem;
+
+  &:focus-visible {
+    outline: 1px solid var(--border-clr);
+  }
+}
+
+// TODO There are different images depending on the color scheme
+// Using dark right now in index.html
+.bg {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+
+  img {
+    max-width: 100%;
+    width: 100%; // quick fix
+  }
+}
+
+header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+h1 {
+  color: var(--clr-grey-100);
+  font-size: 1.7rem;
+  font-weight: var(--f-normal);
+  letter-spacing: .5rem;
+  text-transform: uppercase;
+}
+
+main {
+  display: grid;
+  gap: 1rem;
+}
+
+.container {
+  width: 100%;
+}
+
+.main-head {}
+
+.main-body {
+  display: grid;
+  font-size: .8rem;
+  grid-template-areas:
+    "top top top"
+    "left middle right";
+  grid-template-columns: 50% 0 50%;
+  margin-bottom: var(--filter-height);
+  position: relative;
+}
+
+.col-left,
+.col-right {
+  color: var(--f-clr-secondary);
+  padding: var(--padding);
+}
+
+.col-left {
+  grid-area: left;
+}
+
+.col-right {
+  grid-area: right;
+  text-align: right;
+}
+
+.main-foot {
+  color: var(--f-clr-secondary);
+  font-size: .9rem;
+  padding: var(--padding);
+  text-align: center;
+}
+
+@media (min-width: 40em) {
+  :root {
+    --f-size: 22px;
+  }
+
+  .container {
+    max-width: 30em;
+  }
+  
+  .main-body {
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 0;
+  }
+}
