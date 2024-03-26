@@ -77,7 +77,24 @@ button {
   padding: .5rem;
 
   &:hover,
-  &:focus-visible {
+  &:focus {
     outline: 1px solid var(--border-clr);
+  }
+
+  &[data-toggle-theme] {
+    &:hover,
+    &:focus {
+      --border-clr: var(--clr-grey-200);
+    }
+  }
+}
+
+.btn-link {
+  color: currentColor;
+  padding: 0;
+
+  &:hover {
+    color: var(--clr-blue);
+    outline: 0;
   }
 }

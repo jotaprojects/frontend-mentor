@@ -4,8 +4,8 @@ setupTheme();
 
 // Save todos in some storage
 // Read todos from storage
+  // FIXME: The List chould not be visible if there are no todos when starting application
 // Filter todos on status (All, Active, Completed)
-// Clear all todos
 
 // Update todo (?)
 // Drag'n'drop to reorder todos (?)
@@ -19,20 +19,10 @@ const list = document.querySelector('[data-list]');
 const itemTemplate = document.querySelector('#item-template');
 const itemsLeft = document.querySelector('[data-items-left]');
 const filter = document.querySelector('[data-filter]');
+const filterAll = filter.querySelector('#filter-all');
+const btnClearCompleted = document.querySelector('[data-clear-completed]');
 
 let todos = [];
-
-// When todos are empty do I need to reset the generator?
-// How to handle this when we save/load todos in storage
-function* idGenerator() {
-  let count = 1;
-
-  while(true) {
-    yield count++;
-  }
-}
-
-const generator = idGenerator();
 
 // Create new todo
   // Handle empty values
@@ -43,10 +33,10 @@ form.addEventListener('submit', (e) => {
   if (todoValue === '') return;
 
   const status = todoCheckbox.checked;
-  const id = generator.next();
+  const id = Date.now(); // Use uuid library in next iteration
 
   const todo = {
-    id: id.value,
+    id: id,
     text: todoValue,
     position: 0,
     status: status
@@ -57,20 +47,48 @@ form.addEventListener('submit', (e) => {
   todoInput.value = '';
   todoCheckbox.checked = false;
 
-  renderList();
+  renderList(todos);
+});
+
+btnClearCompleted.addEventListener('click', (e) => {
+  console.log('btnClearCompleted', todos.length)
+  if (todos.length === 0) return;
+  clearCompleted();
+  
+  // TODO Might be good to only remove the element from the DOM instead of rerender?
+  renderList(todos);
+});
+
+filter.addEventListener('change', (e) => {
+  const currentFilter = e.target.value;
+  let filteredTodos = todos;
+
+  //FIXME: If there are no active or no completed todos the list is hidden. 
+  // This should not happen. Suggest: Don't call renderList and 
+  // let the user know that no todos were found (toast message?).
+  switch (currentFilter) {
+    case 'active':
+      filteredTodos = todos.filter((todo) => todo.status === false);
+      break;
+    case 'completed':
+      filteredTodos = todos.filter((todo) => todo.status === true);
+      break;
+  }
+
+  renderList(filteredTodos);
 });
 
 // Don't show the list or filter when there are no todos
-  // .main-body (hide with css or )
-function renderList() {
-  if (todos.length > 0) {
+  // .main-body (hide with css)
+function renderList(items) {
+  if (items.length > 0) {
     list.innerHTML = '';
-    todos.reverse();
-    todos.forEach(renderTodo);
+    items.forEach(renderTodo);
     updateItemsLeft();
-
+    
     showList();
   } else {
+    filterAll.checked = true; // Is this the best place to reset filter?
     hideList();
   }
 }
@@ -88,8 +106,8 @@ function hideList() {
 function renderTodo({ id, text, position, status}) {
   const cloneTemplate = itemTemplate.content.cloneNode(true);
   const liEl = cloneTemplate.querySelector('.list__item');
-  const label = cloneTemplate.querySelector('label');
-  const checkbox = cloneTemplate.querySelector('[type="checkbox"]');
+  const label = cloneTemplate.querySelector('[data-item-label]');
+  const checkbox = cloneTemplate.querySelector('[data-item-checkbox]');
   
   liEl.dataset.itemId = id;
   label.innerText = text;
@@ -107,6 +125,8 @@ function updateItemsLeft() {
 }
 
 list.addEventListener('change', (e) => {
+  if (!e.target.matches('[data-item-checkbox]')) return;
+
   const id = e.target.closest('[data-item-id]').dataset.itemId;
 
   updateTodo(parseInt(id));
@@ -120,7 +140,8 @@ list.addEventListener('click', (e) => {
   const id = e.target.closest('[data-item-id]').dataset.itemId;
   removeTodo(parseInt(id));
 
-  renderList();
+  // TODO Might be good to only remove the element from the DOM instead of rerender?
+  renderList(todos);
 });
 
 // Mark todo with completed
@@ -135,4 +156,9 @@ function updateTodo(id) {
 // Remove a todo
 function removeTodo(id) {
   todos = todos.filter((todo) => todo.id !== id);
+}
+
+// Clear all todos
+function clearCompleted() {
+  todos = todos.filter((todo) => todo.status === false);
 }
