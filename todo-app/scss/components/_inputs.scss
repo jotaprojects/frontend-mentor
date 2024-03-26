@@ -5,6 +5,7 @@ form {
 }
 
 label {
+  cursor: pointer;
   padding: .8rem 0;
 }
 
@@ -13,7 +14,7 @@ input[type="text"] {
   border: 0;
   color: var(--f-clr-primary);
   flex-grow: 1;
-  font-size: .8rem;
+  font-size: 1rem;
   padding: .4rem .3rem;
 
   &:focus {
@@ -23,21 +24,60 @@ input[type="text"] {
 
 input[type="checkbox"] {
   appearance: none;
-  border: 1px solid var(--border-clr);
   border-radius: 50%;
+  border: 1px solid var(--border-clr);
+  cursor: pointer;
   flex-shrink: 0;
   height: 1.3rem;
   margin: 0;
+  position: relative;
   width: 1.3rem;
+
+  &::before {
+    border-radius: inherit;
+    content: '';
+    height: 1.1rem;
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 1.1rem;
+  }
+
+  &:hover {
+    background: var(--gradient);
+
+    &::before {
+      background: var(--box-clr-bg);
+    }
+  }
 
   &:checked {
     background: 
       url('images/icon-check.svg') no-repeat center center, 
       var(--gradient);
+
+    &:hover {
+      &::before {
+        content: none;
+      }
+    }
   }
 
   &:checked + label {
     color: var(--f-clr-secondary);
     text-decoration: line-through;
+  }
+}
+
+button {
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  padding: .5rem;
+
+  &:hover,
+  &:focus-visible {
+    outline: 1px solid var(--border-clr);
   }
 }

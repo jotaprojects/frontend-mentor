@@ -52,6 +52,27 @@
   }
 }
 
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-clr: hsl(0, 0%, 98%);
+
+    --f-clr-primary: var(--clr-grey-800);
+    --f-clr-secondary: var(--clr-grey-600);
+
+    --box-clr-bg: hsl(0, 0%, 100%);
+
+    --border-clr: var(--clr-grey-200);
+  }
+
+  .mode__icon--dark {
+    display: block;
+  }
+
+  .mode__icon--light {
+    display: none;
+  }
+}
+
 html {
   font-size: var(--f-size);
 }
@@ -61,7 +82,7 @@ body {
   font-optical-sizing: auto;
   font-weight: var(--f-normal);
   margin: 0;
-  padding: calc(var(--padding) * 2);
+  padding: var(--padding);
 
   background-color: var(--bg-clr);
   display: flex;
@@ -75,16 +96,6 @@ body {
 
 .mode__icon--light {
   display: block;
-}
-
-button {
-  background-color: transparent;
-  border: 0;
-  padding: .5rem;
-
-  &:focus-visible {
-    outline: 1px solid var(--border-clr);
-  }
 }
 
 // TODO There are different images depending on the color scheme
@@ -120,7 +131,7 @@ main {
   gap: 1rem;
 }
 
-.container {
+.wrapper {
   width: 100%;
 }
 
@@ -128,7 +139,7 @@ main {
 
 .main-body {
   display: grid;
-  font-size: .8rem;
+  font-size: 1rem;
   grid-template-areas:
     "top top top"
     "left middle right";
@@ -161,11 +172,11 @@ main {
 
 @media (min-width: 40em) {
   :root {
-    --f-size: 22px;
+    --f-size: 18px;
   }
 
-  .container {
-    max-width: 30em;
+  .wrapper {
+    max-width: 40em;
   }
   
   .main-body {

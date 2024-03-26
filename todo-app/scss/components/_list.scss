@@ -1,4 +1,4 @@
-.list-container {
+.list-wrapper {
   grid-area: top;
 }
 
@@ -15,5 +15,5 @@
   display: grid;
   gap: 1rem;
   grid-template-columns: auto 1fr auto;
-  padding: .2rem var(--padding);
+  padding: .5rem var(--padding);
 }

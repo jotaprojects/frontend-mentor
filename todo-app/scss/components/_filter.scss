@@ -1,31 +1,32 @@
+// FIXME You can't reach the input radios with tab. 
+
 .filter {
-  bottom: calc(var(--filter-height) *-1);
+  bottom: calc(var(--filter-height) * -1);
   color: var(--f-clr-secondary);
   display: flex;
-  font-size: .9rem;
+  font-size: 1rem;
   font-weight: var(--f-bold);
   gap: 1rem;
   justify-content: center;
   left: 0;
   position: absolute;
   right: 0;
-}
 
-.filter[data-filter="all"] {
-  div:nth-child(1) {
-    color: var(--clr-blue);
+  input[type="radio"] {
+    appearance: none;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    position: absolute;
+
+    &:checked + label {
+      color: var(--clr-blue);
+    }
   }
-}
 
-.filter[data-filter="active"] {
-  div:nth-child(2) {
-    color: var(--clr-blue);
-  }
-}
-
-.filter[data-filter="complete"] {
-  div:nth-child(3) {
-    color: var(--clr-blue);
+  label {
+    cursor: pointer;
+    padding: 1rem;
   }
 }
 
