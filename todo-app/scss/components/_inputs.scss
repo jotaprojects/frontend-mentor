@@ -97,4 +97,9 @@ button {
     color: var(--clr-blue);
     outline: 0;
   }
+
+  &:focus {
+    outline: 0;
+    text-decoration: underline;
+  }
 }

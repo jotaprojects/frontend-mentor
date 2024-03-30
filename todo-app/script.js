@@ -1,11 +1,6 @@
 import { setupTheme } from "./js/toggleTheme";
-
-setupTheme();
-
-// Save todos in some storage
-// Read todos from storage
-  // FIXME: The List chould not be visible if there are no todos when starting application
-// Filter todos on status (All, Active, Completed)
+import { readStorage, saveStorage } from "./js/storage";
+import { data } from "./data/mock";
 
 // Update todo (?)
 // Drag'n'drop to reorder todos (?)
@@ -21,86 +16,94 @@ const itemsLeft = document.querySelector('[data-items-left]');
 const filter = document.querySelector('[data-filter]');
 const filterAll = filter.querySelector('#filter-all');
 const btnClearCompleted = document.querySelector('[data-clear-completed]');
+const listMsgEl = document.querySelector('[data-list-msg]');
+const msg = {
+  empty: "You are done with all your todos! 🙌",
+  zeroResults: "No todos found."
+};
 
-let todos = [];
+let currentFilter = 'all';
+let globalTodos = [];
+
+setupTheme();
+setupList();
+
+function setupList() {
+  // Only needed to set up mock data when no todos are saved.
+  const storageTodos = readStorage('todos');
+  globalTodos = storageTodos.length > 0 ? storageTodos : data;
+
+  renderList();
+}
 
 // Create new todo
   // Handle empty values
 form.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  const todoValue = todoInput.value;
+  const todoValue = sanitizeInput(todoInput.value.trim());
   if (todoValue === '') return;
 
-  const status = todoCheckbox.checked;
-  const id = Date.now(); // Use uuid library in next iteration
-
-  const todo = {
-    id: id,
-    text: todoValue,
-    position: 0,
-    status: status
-  };
-
-  todos.push(todo);
-
+  runAction('add', {value: todoValue, status: todoCheckbox.checked});
+  
   todoInput.value = '';
   todoCheckbox.checked = false;
-
-  renderList(todos);
 });
 
 btnClearCompleted.addEventListener('click', (e) => {
-  console.log('btnClearCompleted', todos.length)
-  if (todos.length === 0) return;
-  clearCompleted();
+  if (globalTodos.length === 0) return;
   
-  // TODO Might be good to only remove the element from the DOM instead of rerender?
-  renderList(todos);
+  runAction('clear');
 });
 
+// Filter todos on status (All, Active, Completed)
 filter.addEventListener('change', (e) => {
-  const currentFilter = e.target.value;
-  let filteredTodos = todos;
-
-  //FIXME: If there are no active or no completed todos the list is hidden. 
-  // This should not happen. Suggest: Don't call renderList and 
-  // let the user know that no todos were found (toast message?).
-  switch (currentFilter) {
-    case 'active':
-      filteredTodos = todos.filter((todo) => todo.status === false);
-      break;
-    case 'completed':
-      filteredTodos = todos.filter((todo) => todo.status === true);
-      break;
-  }
-
-  renderList(filteredTodos);
+  currentFilter = e.target.value;
+  runAction(); // Runs empty to avoid running filterTodos twise
 });
 
-// Don't show the list or filter when there are no todos
-  // .main-body (hide with css)
-function renderList(items) {
+list.addEventListener('change', (e) => {
+  if (!e.target.matches('[data-item-checkbox]')) return;
+
+  const id = parseInt(e.target.closest('[data-item-id]').dataset.itemId);
+  runAction('update', {id});
+});
+
+list.addEventListener('click', (e) => {
+  // use of closest as matches is conflicting with svg inside button
+  if (!e.target.closest('[data-remove]')) return;
+
+  const id = parseInt(e.target.closest('[data-item-id]').dataset.itemId);
+  runAction('delete', {id});
+});
+
+function renderList() {
+  const items = filterTodos();
+  list.innerHTML = '';
+
+  hideMsg();
+  updateItemsLeft();
+  
   if (items.length > 0) {
-    list.innerHTML = '';
     items.forEach(renderTodo);
-    updateItemsLeft();
-    
-    showList();
   } else {
-    filterAll.checked = true; // Is this the best place to reset filter?
-    hideList();
+    showMsg(msg.zeroResults);
+  }
+  
+  if (globalTodos.length === 0) {
+    filterAll.checked = true;
+    showMsg(msg.empty);
   }
 }
 
-function showList() {
-  mainBody.classList.remove('invisible');
-  mainFoot.classList.remove('invisible');
+function showMsg(msg) {
+  listMsgEl.innerText = msg;
+  listMsgEl.setAttribute('aria-hidden', false);
 }
 
-function hideList() {
-  mainBody.classList.add('invisible');
-  mainFoot.classList.add('invisible');
+function hideMsg() {
+  listMsgEl.innerText = '';
+  listMsgEl.setAttribute('aria-hidden', true);
 }
 
 function renderTodo({ id, text, position, status}) {
@@ -118,35 +121,69 @@ function renderTodo({ id, text, position, status}) {
   list.appendChild(cloneTemplate);
 }
 
+function filterTodos() {
+  let filteredTodos = globalTodos;
+
+  switch (currentFilter) {
+    case 'active':
+      filteredTodos = globalTodos.filter((todo) => todo.status === false);
+      break;
+    case 'completed':
+      filteredTodos = globalTodos.filter((todo) => todo.status === true);
+      break;
+  }
+
+  return filteredTodos;
+}
+
 // Update items left
 function updateItemsLeft() {
-  const left = todos.filter((item) => item.status !== true);
+  const left = globalTodos.filter((item) => item.status !== true);
   itemsLeft.innerText = left.length;
 }
 
-list.addEventListener('change', (e) => {
-  if (!e.target.matches('[data-item-checkbox]')) return;
+function runAction(action, args) {
+  switch(action) {
+    case 'add':
+      addTodo(args);
+      break;
+    case 'update':
+      updateTodo(args);
+      break;
+    case 'delete':
+      deleteTodo(args);
+      break;
+    case 'clear':
+      clearCompleted();
+      break;
+  }
 
-  const id = e.target.closest('[data-item-id]').dataset.itemId;
+  saveStorage('todos', globalTodos);
+  renderList();
+}
 
-  updateTodo(parseInt(id));
-  updateItemsLeft();
-})
+function getTodoId(childEl) {
+  return childEl.closest('[data-item-id]').dataset.itemId;
+}
 
-list.addEventListener('click', (e) => {
-  // use of closest as matches is conflicting with svg inside button
-  if (!e.target.closest('[data-remove]')) return;
+function addTodo(args) {
+  const {value, status} = args;
+  const id = Date.now(); // Use uuid library in next iteration
 
-  const id = e.target.closest('[data-item-id]').dataset.itemId;
-  removeTodo(parseInt(id));
+  const todo = {
+    id: id,
+    text: value,
+    position: 0,
+    status: status
+  };
 
-  // TODO Might be good to only remove the element from the DOM instead of rerender?
-  renderList(todos);
-});
+  globalTodos.push(todo);
+}
 
 // Mark todo with completed
-function updateTodo(id) {
-  const item = todos.find((todo) => todo.id === id);
+function updateTodo(args) {
+  const {id} = args;
+  const item = globalTodos.find((todo) => todo.id === id);
 
   if (item) {
     item.status = item.status ? false : true;
@@ -154,11 +191,18 @@ function updateTodo(id) {
 }
 
 // Remove a todo
-function removeTodo(id) {
-  todos = todos.filter((todo) => todo.id !== id);
+function deleteTodo(args) {
+  const {id} = args;
+  globalTodos = globalTodos.filter((todo) => todo.id !== id);
 }
 
 // Clear all todos
 function clearCompleted() {
-  todos = todos.filter((todo) => todo.status === false);
+  globalTodos = globalTodos.filter((todo) => todo.status === false);
+}
+
+// Simple encoding input value 
+// Check https://github.com/cure53/DOMPurify for future
+function sanitizeInput(value) {
+  return encodeURI(value.toWellFormed());
 }
