@@ -29,3 +29,11 @@
 .invisible {
   display: none;
 }
+
+.dragging {
+  border: 1px dashed green;
+}
+
+.dropping {
+  opacity: .2;
+}

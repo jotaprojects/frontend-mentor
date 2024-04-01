@@ -1,9 +1,8 @@
 import { setupTheme } from "./js/toggleTheme";
-import { readStorage, saveStorage } from "./js/storage";
+import { todoKey, readStorage, saveStorage } from "./js/storage";
 import { data } from "./data/mock";
 
 // Update todo (?)
-// Drag'n'drop to reorder todos (?)
 
 const form = document.querySelector('#todo-form');
 const todoCheckbox = form.querySelector('#todo-checkbox');
@@ -79,6 +78,7 @@ list.addEventListener('click', (e) => {
 
 function renderList() {
   const items = filterTodos();
+  items.sort((a, b) => a.position - b.position);
   list.innerHTML = '';
 
   hideMsg();
@@ -113,6 +113,7 @@ function renderTodo({ id, text, position, status}) {
   const checkbox = cloneTemplate.querySelector('[data-item-checkbox]');
   
   liEl.dataset.itemId = id;
+  liEl.setAttribute('draggable', true);
   label.innerText = text;
   label.setAttribute('for', `item-${id}`);
   checkbox.checked = status;
@@ -158,7 +159,7 @@ function runAction(action, args) {
       break;
   }
 
-  saveStorage('todos', globalTodos);
+  saveStorage(todoKey, globalTodos);
   renderList();
 }
 
@@ -205,4 +206,47 @@ function clearCompleted() {
 // Check https://github.com/cure53/DOMPurify for future
 function sanitizeInput(value) {
   return encodeURI(value.toWellFormed());
+}
+
+// Drag'n'drop to reorder todos 
+// FIXME Border bottom on the li seems to mess up drag-n-drop. The border is not counted into the dropzone
+let draggedItem = null;
+
+list.addEventListener('dragstart', (e) => {
+  draggedItem = e.target;
+  e.dataTransfer.setData('text/plain', '');
+  e.target.classList.add('dragging');
+});
+
+
+list.addEventListener('dragover', (e) => {
+  e.preventDefault(); // Allow drop
+  const targetItem = e.target.closest('li'); // Get closest parent li element?
+  if (targetItem && targetItem !== draggedItem) {
+    if (!targetItem.previousElementSibling) {
+      list.insertBefore(draggedItem, list.firstChild);
+    } else {
+      list.insertBefore(draggedItem, targetItem.nextSibling); // Move dragged to new position
+    }
+  }
+});
+
+list.addEventListener('dragend', (e) => {
+  e.target.classList.remove('dragging');
+  draggedItem = null;
+  updatePosition();
+});
+
+function updatePosition() {
+  const itemIds = [];
+  const lis = list.querySelectorAll('li');
+  lis.forEach(li => {
+    itemIds.push(parseInt(li.dataset.itemId));
+  });
+
+  globalTodos.forEach(todo => {
+    todo.position = itemIds.indexOf(todo.id);
+  });
+
+  saveStorage(todoKey, globalTodos);
 }

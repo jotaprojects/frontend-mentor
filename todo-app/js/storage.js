@@ -1,6 +1,8 @@
 const PREFIX = 'TODO-';
-const todoKey = 'todos';
+export const todoKey = 'todos';
 const themeKey = 'theme';
+
+// Make use of the const above and not the param.
 
 export function readStorage(key) {
   return JSON.parse(localStorage.getItem(PREFIX + key)) || [];
