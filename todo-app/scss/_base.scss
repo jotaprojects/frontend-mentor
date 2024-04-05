@@ -24,7 +24,7 @@
   --f-clr-secondary: var(--clr-blue-200);
 
   --border-radius: .4rem;
-  --border-clr: var(--clr-blue-600);
+  --border-clr: var(--clr-blue-400);
 
   --padding: 1rem;
 
@@ -37,12 +37,9 @@
 
 [data-theme="light"] {
   --bg-clr: hsl(0, 0%, 98%);
-
   --f-clr-primary: var(--clr-grey-800);
   --f-clr-secondary: var(--clr-grey-600);
-
   --box-clr-bg: hsl(0, 0%, 100%);
-
   --border-clr: var(--clr-grey-200);
 
   .mode__icon--dark {
@@ -57,12 +54,9 @@
 @media (prefers-color-scheme: light) {
   :root {
     --bg-clr: hsl(0, 0%, 98%);
-
     --f-clr-primary: var(--clr-grey-800);
     --f-clr-secondary: var(--clr-grey-600);
-
     --box-clr-bg: hsl(0, 0%, 100%);
-
     --border-clr: var(--clr-grey-200);
   }
 
@@ -85,12 +79,10 @@ body {
   font-weight: var(--f-normal);
   margin: 0;
   padding: var(--padding);
-
   background-color: var(--bg-clr);
   display: flex;
   flex-direction: column;
   align-items: center;
-
   transition: background-color var(--transition-duration) ease;
 }
 
@@ -102,12 +94,10 @@ body {
   display: block;
 }
 
-// TODO There are different images depending on the color scheme
-// Using dark right now in index.html
 .bg {
+  inset: 0;
   position: fixed;
   z-index: -1;
-  inset: 0;
 
   img {
     max-width: 100%;

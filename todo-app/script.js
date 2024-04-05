@@ -1,14 +1,13 @@
 import { setupTheme } from "./js/toggleTheme";
-import { todoKey, readStorage, saveStorage } from "./js/storage";
+import { readStorage, saveStorage } from "./js/storage";
 import { data } from "./data/mock";
 
 // Update todo (?)
 
+// Selectors
 const form = document.querySelector('#todo-form');
 const todoCheckbox = form.querySelector('#todo-checkbox');
 const todoInput = form.querySelector('#todo-input');
-const mainBody = document.querySelector('.main-body');
-const mainFoot = document.querySelector('.main-foot');
 const list = document.querySelector('[data-list]');
 const itemTemplate = document.querySelector('#item-template');
 const itemsLeft = document.querySelector('[data-items-left]');
@@ -16,12 +15,28 @@ const filter = document.querySelector('[data-filter]');
 const filterAll = filter.querySelector('#filter-all');
 const btnClearCompleted = document.querySelector('[data-clear-completed]');
 const listMsgEl = document.querySelector('[data-list-msg]');
+
+// Actions
+const TODO_ADD = 'add';
+const TODO_UPDATE = 'update';
+const TODO_DELETE = 'delete';
+const TODO_CLEAR = 'clear';
+
+// Filters
+const FILTER_ALL = 'all';
+const FILTER_ACTIVE = 'active';
+const FILTER_COMPLETED = 'completed';
+
+// Storage Keys
+const KEY_TODO = 'todos';
+
+const listItemIdAttr = '[data-item-id]';
 const msg = {
   empty: "You are done with all your todos! 🙌",
   zeroResults: "No todos found."
 };
 
-let currentFilter = 'all';
+let currentFilter = FILTER_ALL;
 let globalTodos = [];
 
 setupTheme();
@@ -29,7 +44,7 @@ setupList();
 
 function setupList() {
   // Only needed to set up mock data when no todos are saved.
-  const storageTodos = readStorage('todos');
+  const storageTodos = readStorage(KEY_TODO);
   globalTodos = storageTodos.length > 0 ? storageTodos : data;
 
   renderList();
@@ -43,7 +58,7 @@ form.addEventListener('submit', (e) => {
   const todoValue = sanitizeInput(todoInput.value.trim());
   if (todoValue === '') return;
 
-  runAction('add', {value: todoValue, status: todoCheckbox.checked});
+  runAction(TODO_ADD, { value: todoValue, status: todoCheckbox.checked });
   
   todoInput.value = '';
   todoCheckbox.checked = false;
@@ -52,7 +67,7 @@ form.addEventListener('submit', (e) => {
 btnClearCompleted.addEventListener('click', (e) => {
   if (globalTodos.length === 0) return;
   
-  runAction('clear');
+  runAction(TODO_CLEAR);
 });
 
 // Filter todos on status (All, Active, Completed)
@@ -64,16 +79,20 @@ filter.addEventListener('change', (e) => {
 list.addEventListener('change', (e) => {
   if (!e.target.matches('[data-item-checkbox]')) return;
 
-  const id = parseInt(e.target.closest('[data-item-id]').dataset.itemId);
-  runAction('update', {id});
+  const id = getTodoIdFromTarget(e.target)
+  if (id !== null) {
+    runAction(TODO_UPDATE, { id });
+  }
 });
 
 list.addEventListener('click', (e) => {
   // use of closest as matches is conflicting with svg inside button
   if (!e.target.closest('[data-remove]')) return;
 
-  const id = parseInt(e.target.closest('[data-item-id]').dataset.itemId);
-  runAction('delete', {id});
+  const id = getTodoIdFromTarget(e.target);
+  if (id !== null) {
+    runAction(TODO_DELETE, { id });
+  }
 });
 
 function renderList() {
@@ -123,54 +142,51 @@ function renderTodo({ id, text, position, status}) {
 }
 
 function filterTodos() {
-  let filteredTodos = globalTodos;
-
   switch (currentFilter) {
-    case 'active':
-      filteredTodos = globalTodos.filter((todo) => todo.status === false);
-      break;
-    case 'completed':
-      filteredTodos = globalTodos.filter((todo) => todo.status === true);
-      break;
+    case FILTER_ACTIVE:
+      return globalTodos.filter((todo) => !todo.status);
+    case FILTER_COMPLETED:
+      return globalTodos.filter((todo) => todo.status);
+    default:
+      return globalTodos;
   }
-
-  return filteredTodos;
 }
 
 // Update items left
 function updateItemsLeft() {
-  const left = globalTodos.filter((item) => item.status !== true);
-  itemsLeft.innerText = left.length;
+  // accumulator (integer)
+  const left = globalTodos.reduce((count, item) => count + (item.status !== true ? 1 : 0), 0);
+  itemsLeft.innerText = left;
 }
 
 function runAction(action, args) {
-  switch(action) {
-    case 'add':
+  switch (action) {
+    case TODO_ADD:
       addTodo(args);
       break;
-    case 'update':
+    case TODO_UPDATE:
       updateTodo(args);
       break;
-    case 'delete':
+    case TODO_DELETE:
       deleteTodo(args);
       break;
-    case 'clear':
+    case TODO_CLEAR:
       clearCompleted();
       break;
   }
 
-  saveStorage(todoKey, globalTodos);
+  saveStorage(KEY_TODO, globalTodos);
   renderList();
 }
 
-function getTodoId(childEl) {
-  return childEl.closest('[data-item-id]').dataset.itemId;
+function getTodoIdFromTarget(target) {
+  const itemEl = target.closest(listItemIdAttr);
+  return itemEl ? parseInt(itemEl.dataset.itemId) : null;
 }
 
-function addTodo(args) {
-  const {value, status} = args;
+function addTodo({ value, status }) {
   const id = Date.now(); // Use uuid library in next iteration
-
+  
   const todo = {
     id: id,
     text: value,
@@ -182,24 +198,22 @@ function addTodo(args) {
 }
 
 // Mark todo with completed
-function updateTodo(args) {
-  const {id} = args;
-  const item = globalTodos.find((todo) => todo.id === id);
+function updateTodo({ id }) {
+  const todoItem = globalTodos.find((todo) => todo.id === id);
 
-  if (item) {
-    item.status = item.status ? false : true;
+  if (todoItem) {
+    todoItem.status = !todoItem.status;
   }
 }
 
 // Remove a todo
-function deleteTodo(args) {
-  const {id} = args;
+function deleteTodo({ id }) {
   globalTodos = globalTodos.filter((todo) => todo.id !== id);
 }
 
 // Clear all todos
 function clearCompleted() {
-  globalTodos = globalTodos.filter((todo) => todo.status === false);
+  globalTodos = globalTodos.filter((todo) => !todo.status);
 }
 
 // Simple encoding input value 
@@ -208,8 +222,8 @@ function sanitizeInput(value) {
   return encodeURI(value.toWellFormed());
 }
 
-// Drag'n'drop to reorder todos 
-// FIXME Border bottom on the li seems to mess up drag-n-drop. The border is not counted into the dropzone
+// Drag'n'drop to reorder todos
+// Note drag'n'drop API does not support touch.
 let draggedItem = null;
 
 list.addEventListener('dragstart', (e) => {
@@ -218,10 +232,10 @@ list.addEventListener('dragstart', (e) => {
   e.target.classList.add('dragging');
 });
 
-
 list.addEventListener('dragover', (e) => {
   e.preventDefault(); // Allow drop
-  const targetItem = e.target.closest('li'); // Get closest parent li element?
+  const targetItem = e.target.closest(listItemIdAttr);
+  targetItem.classList.add('dropping');
   if (targetItem && targetItem !== draggedItem) {
     if (!targetItem.previousElementSibling) {
       list.insertBefore(draggedItem, list.firstChild);
@@ -231,22 +245,49 @@ list.addEventListener('dragover', (e) => {
   }
 });
 
+list.addEventListener('dragenter', (e) => {
+  e.preventDefault();
+  const targetItem = e.target.closest(listItemIdAttr); 
+  targetItem.classList.add('dropping');
+});
+
+list.addEventListener('dragleave', preventDragDefault);
+list.addEventListener('drop', preventDragDefault);
+
 list.addEventListener('dragend', (e) => {
   e.target.classList.remove('dragging');
   draggedItem = null;
-  updatePosition();
+  updatePositions();
 });
 
-function updatePosition() {
-  const itemIds = [];
-  const lis = list.querySelectorAll('li');
-  lis.forEach(li => {
-    itemIds.push(parseInt(li.dataset.itemId));
+function preventDragDefault(e) {
+  e.preventDefault();
+  const targetItem = e.target.closest(listItemIdAttr);
+  targetItem.classList.remove('dropping');
+}
+
+function updatePositions() {
+  const listItems = list.querySelectorAll(listItemIdAttr);
+  const itemIds = Array.from(listItems).map(li => {
+    const id = parseInt(li.dataset.itemId);
+    if (isNaN(id)) {
+      throw new Error('Invalid item ID found');
+    }
+    return id;
   });
+  // accumulator (empty object), currentValue, currentIndex
+  const idToPosition = itemIds.reduce((acc, id, index) => {
+    acc[id] = index;
+    return acc;
+  }, {});
 
   globalTodos.forEach(todo => {
-    todo.position = itemIds.indexOf(todo.id);
+    if (idToPosition.hasOwnProperty(todo.id)) {
+      todo.position = idToPosition[todo.id];
+    } else {
+      throw new Error(`Todo with ID ${todo.id} not found in the list.`);
+    }
   });
 
-  saveStorage(todoKey, globalTodos);
+  saveStorage(KEY_TODO, globalTodos);
 }
