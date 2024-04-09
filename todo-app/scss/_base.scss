@@ -16,23 +16,24 @@
 
   --gradient: linear-gradient(120deg, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
 
-  --f-family: "Josefin Sans", sans-serif;
-  --f-size: 16px;
-  --f-normal: 400;
-  --f-bold: 700;
+  --ff-base: "Josefin Sans", sans-serif;
+  --fs-base: 16px;
+  --fw-normal: 400;
+  --fw-bold: 700;
   --f-clr-primary: var(--clr-blue-100);
   --f-clr-secondary: var(--clr-blue-200);
 
   --border-radius: .4rem;
-  --border-clr: var(--clr-blue-400);
+  --border-clr: var(--clr-blue-200);
 
-  --padding: 1rem;
+  --spacing-100: 1rem;
 
   --transition-duration: 300ms;
 
   --filter-height: 4rem;
 
   --box-clr-bg: var(--clr-blue-800);
+  --box-drop-bg: var(--clr-blue-900);
 }
 
 [data-theme="light"] {
@@ -40,6 +41,7 @@
   --f-clr-primary: var(--clr-grey-800);
   --f-clr-secondary: var(--clr-grey-600);
   --box-clr-bg: hsl(0, 0%, 100%);
+  --box-drop-bg: var(--clr-grey-400);
   --border-clr: var(--clr-grey-200);
 
   .mode__icon--dark {
@@ -57,6 +59,7 @@
     --f-clr-primary: var(--clr-grey-800);
     --f-clr-secondary: var(--clr-grey-600);
     --box-clr-bg: hsl(0, 0%, 100%);
+    --box-drop-bg: var(--clr-grey-400);
     --border-clr: var(--clr-grey-200);
   }
 
@@ -70,15 +73,15 @@
 }
 
 html {
-  font-size: var(--f-size);
+  font-size: var(--fs-base);
 }
 
 body {
-  font-family: var(--f-family);
+  font-family: var(--ff-base);
   font-optical-sizing: auto;
-  font-weight: var(--f-normal);
+  font-weight: var(--fw-normal);
   margin: 0;
-  padding: var(--padding);
+  padding: var(--spacing-100);
   background-color: var(--bg-clr);
   display: flex;
   flex-direction: column;
@@ -115,7 +118,7 @@ header {
 h1 {
   color: var(--clr-grey-100);
   font-size: 1.7rem;
-  font-weight: var(--f-normal);
+  font-weight: var(--fw-normal);
   letter-spacing: .5rem;
   text-transform: uppercase;
 }
@@ -145,7 +148,7 @@ main {
 .col-left,
 .col-right {
   color: var(--f-clr-secondary);
-  padding: var(--padding);
+  padding: var(--spacing-100);
 }
 
 .col-left {
@@ -160,19 +163,19 @@ main {
 .main-foot {
   color: var(--f-clr-secondary);
   font-size: .9rem;
-  padding: var(--padding);
+  padding: var(--spacing-100);
   text-align: center;
 }
 
 [data-list-msg][aria-hidden="false"] {
   color: var(--f-clr-secondary);
-  padding: var(--padding);
+  padding: var(--spacing-100);
   text-align: center;
 }
 
 @media (min-width: 40em) {
   :root {
-    --f-size: 18px;
+    --fs-base: 18px;
   }
 
   .wrapper {

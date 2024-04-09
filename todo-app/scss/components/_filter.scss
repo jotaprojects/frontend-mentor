@@ -5,7 +5,7 @@
   color: var(--f-clr-secondary);
   display: flex;
   font-size: 1rem;
-  font-weight: var(--f-bold);
+  font-weight: var(--fw-bold);
   gap: 1rem;
   justify-content: center;
   left: 0;
@@ -36,12 +36,9 @@
 
 @media (min-width: 40em) {
   .filter {
-    grid-area: middle;
-    padding: var(--padding) 0;
-    position: static;
-  }
-
-  .box.filter {
     box-shadow: none;
+    grid-area: middle;
+    padding: var(--spacing-100) 0;
+    position: static;
   }
 }

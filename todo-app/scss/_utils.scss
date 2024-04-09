@@ -31,9 +31,22 @@
 }
 
 .dragging {
-  border: 1px dashed green;
+  opacity: .5;
+  touch-action: none;
 }
 
 .dropping {
-  opacity: .5;
+  background-color: var(--box-drop-bg);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

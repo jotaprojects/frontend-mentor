@@ -30,6 +30,9 @@ const FILTER_COMPLETED = 'completed';
 // Storage Keys
 const KEY_TODO = 'todos';
 
+// Third party Drag n drop
+let sortable = null;
+
 const listItemIdAttr = '[data-item-id]';
 const msg = {
   empty: "You are done with all your todos! 🙌",
@@ -48,6 +51,16 @@ function setupList() {
   globalTodos = storageTodos.length > 0 ? storageTodos : data;
 
   renderList();
+
+  sortable = Sortable.create(list, {
+    animation: 300,
+    dragClass: "dragging",
+    ghostClass: "dropping",
+    direction: "vertical",
+    onEnd: function (event) {
+      updatePositions()
+    },
+  });
 }
 
 // Create new todo
@@ -220,50 +233,6 @@ function clearCompleted() {
 // Check https://github.com/cure53/DOMPurify for future
 function sanitizeInput(value) {
   return encodeURI(value.toWellFormed());
-}
-
-// Drag'n'drop to reorder todos
-// Note drag'n'drop API does not support touch.
-let draggedItem = null;
-
-list.addEventListener('dragstart', (e) => {
-  draggedItem = e.target;
-  e.dataTransfer.setData('text/plain', '');
-  e.target.classList.add('dragging');
-});
-
-list.addEventListener('dragover', (e) => {
-  e.preventDefault(); // Allow drop
-  const targetItem = e.target.closest(listItemIdAttr);
-  targetItem.classList.add('dropping');
-  if (targetItem && targetItem !== draggedItem) {
-    if (!targetItem.previousElementSibling) {
-      list.insertBefore(draggedItem, list.firstChild);
-    } else {
-      list.insertBefore(draggedItem, targetItem.nextSibling); // Move dragged to new position
-    }
-  }
-});
-
-list.addEventListener('dragenter', (e) => {
-  e.preventDefault();
-  const targetItem = e.target.closest(listItemIdAttr); 
-  targetItem.classList.add('dropping');
-});
-
-list.addEventListener('dragleave', preventDragDefault);
-list.addEventListener('drop', preventDragDefault);
-
-list.addEventListener('dragend', (e) => {
-  e.target.classList.remove('dragging');
-  draggedItem = null;
-  updatePositions();
-});
-
-function preventDragDefault(e) {
-  e.preventDefault();
-  const targetItem = e.target.closest(listItemIdAttr);
-  targetItem.classList.remove('dropping');
 }
 
 function updatePositions() {
